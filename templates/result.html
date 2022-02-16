@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Wprowadzony pesel:</h5>
+                <div><span id="pes"></span></div>
+                <h5 class="pt-3">Rezultat:</h5>
+                <div id="result"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pt-5">
+    <div class="row justify-content-md-center">
+        <div class="col-md-5">
+            <h1>Sprawdzanie Peselu</h1>
+            <form action="" id="post-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Podaj Imię </label>
+                    <input class="form-control"  id="name" placeholder="" required>    <!--ccc-->
+                </div>
+                <div class="form-group">
+                    <label for="is_valid_number">Podaj Pesel</label>
+                    <input type="number" class="form-control"  id="is_valid_number" placeholder="" required>    <!--ccc-->
+                </div>
+                <button type="submit" value="Submit" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Wyślij</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('submit', '#post-form',function(e){
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url:'{% url "validator:submit_validate" %}',
+            data:{
+                is_valid_number:$('#is_valid_number').val(),
+                name:$('#name').val(),
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                action: 'post'
+            },
+            success:function(json) {
+                document.forms["post-form"].reset();
+                document.getElementById("result").innerHTML = json['result']
+                document.getElementById("pes").innerHTML = json['is_valid_number']
+                console.log(document)
+            },
+            error : function(xhr,errmsg,err) {
+
+            }
+        });
+    })
+</script>
+
+
+{% endblock content %}
+
+
+
